@@ -11,6 +11,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../api";
 
 const PRIORITY_STYLES = {
   High: "bg-red-100 border-red-400 text-red-600",
@@ -32,7 +33,7 @@ const ReminderList = ({ refreshTrigger }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/reminders/");
+      const res = await fetch(`${BASE_URL}/api/reminders/`);
       if (!res.ok) throw new Error("Failed to load");
       setReminders(await res.json());
     } catch {
@@ -48,10 +49,11 @@ const ReminderList = ({ refreshTrigger }) => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/reminders/", {
+        const res = await fetch(`${BASE_URL}/api/reminders/`, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error();
+        
         setReminders(await res.json());
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -85,7 +87,7 @@ const ReminderList = ({ refreshTrigger }) => {
     setSaving(id);
     setError(null);
     try {
-      const res = await fetch(`/api/reminders/${id}/`, {
+      const res = await fetch(`${BASE_URL}/api/reminders/${id}/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -113,7 +115,9 @@ const ReminderList = ({ refreshTrigger }) => {
     setDeletingId(id);
     setError(null);
     try {
-      const res = await fetch(`/api/reminders/${id}/`, { method: "DELETE" });
+      const res = await fetch(`${BASE_URL}/api/reminders/${id}/`, {
+        method: "DELETE",
+      });
       if (!res.ok) {
         setError("Failed to delete.");
         return;

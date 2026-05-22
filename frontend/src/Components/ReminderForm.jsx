@@ -10,8 +10,9 @@ import {
   FaSpinner,
   FaTimes,
 } from "react-icons/fa";
+import BASE_URL from "../api";
 
-const ReminderForm = ({ onClose }) => {
+const ReminderForm = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     title: "",
@@ -47,7 +48,7 @@ const ReminderForm = ({ onClose }) => {
     setStatus("loading");
     const datetime = `${form.reminder_date}T${form.reminder_time}`;
     try {
-      const response = await fetch("/api/reminders/", {
+      const response = await fetch(`${BASE_URL}/api/reminders/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -99,14 +100,13 @@ const ReminderForm = ({ onClose }) => {
               New <span className="text-emerald-600">reminder</span>
             </h2>
           </div>
-          {onClose && (
-            <button
-              onClick={() => navigate("/")}
-              className="text-content hover:text-gray-700 transition mt-1"
-            >
-              <FaTimes size={16} />
-            </button>
-          )}
+
+          <button
+            onClick={() => navigate("/")}
+            className="text-content hover:text-gray-700 transition mt-1"
+          >
+            <FaTimes size={16} />
+          </button>
         </div>
 
         {/* Success */}
