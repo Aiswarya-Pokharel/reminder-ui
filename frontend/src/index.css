@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #dbe7e4;
+  --color-secondary: #fffdf7;
+  --color-accent: #64b6ac;
+  --color-accent-hover: #4a8c88;
+  --color-border: #d6e2e9;
+}
+
+:root {
+  font-family: 'Inter', sans-serif;
+}
+
+input,
+textarea,
+select {
+  outline: none;
+  border: 1px solid var(--color-border);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(100, 182, 172, 0.2);
+}
