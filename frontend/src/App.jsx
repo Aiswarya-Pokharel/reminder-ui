@@ -1,4 +1,4 @@
-import ReminderForm from "./Components/Reminder/ReminderForm";
+import ReminderForm from "./Components/ReminderForm";
 import ReminderList from "./Components/ReminderList";
 import { useState } from "react";
 import Dashboard from "./Dashboard/Dashboard";
