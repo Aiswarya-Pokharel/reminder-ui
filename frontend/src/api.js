@@ -1,2 +1,2 @@
-const BASE_URL = "https://reminder-ui-c1no.onrender.com/";
+const BASE_URL = "https://reminder-ui-1.onrender.com/";
 export default BASE_URL;
