@@ -7,6 +7,7 @@ class Reminder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     reminder_time = models.DateTimeField()
     priority = models.CharField(max_length=50, choices=[('Low', 'Low'), ('Medium', 'Medium'), ('High', 'High')], default='Medium')
+    is_fired      = models.BooleanField(default=False) 
 
     def __str__(self):
       return self.title
