@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import {
   FaEdit,
   FaTrash,
-  FaCheck,
   FaTimes,
   FaTag,
   FaCalendarAlt,
@@ -28,6 +27,7 @@ const ReminderList = ({ refreshTrigger }) => {
   const [deletingId, setDeletingId] = useState(null);
   const [saving, setSaving] = useState(null);
   const [error, setError] = useState(null);
+  const [deleteModalId, setDeleteModalId] = useState(null);
 
   const fetchReminders = useCallback(async () => {
     setLoading(true);
@@ -53,7 +53,7 @@ const ReminderList = ({ refreshTrigger }) => {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error();
-        
+
         setReminders(await res.json());
       } catch (err) {
         if (err.name === "AbortError") return;
@@ -110,8 +110,9 @@ const ReminderList = ({ refreshTrigger }) => {
     }
   };
 
-  const deleteReminder = async (id) => {
-    if (!window.confirm("Delete this reminder?")) return;
+  const deleteReminder = async () => {
+    const id = deleteModalId;
+    setDeleteModalId(null);
     setDeletingId(id);
     setError(null);
     try {
@@ -297,18 +298,13 @@ const ReminderList = ({ refreshTrigger }) => {
                           disabled={saving === r.id}
                           className="flex-1 flex items-center justify-center gap-1 bg-accent hover:bg-accent-hover text-white text-xs font-medium py-2 rounded-xl transition disabled:opacity-60"
                         >
-                          {saving === r.id ? (
-                            <FaSpinner className="animate-spin" size={11} />
-                          ) : (
-                            <FaCheck size={11} />
-                          )}{" "}
                           Save
                         </button>
                         <button
                           onClick={cancelEdit}
                           className="flex-1 flex items-center justify-center gap-1 border border-gray text-gray-500 text-xs font-medium py-2 rounded-xl hover:bg-[#f4f3ee] transition"
                         >
-                          <FaTimes size={11} /> Cancel
+                          Cancel
                         </button>
                       </div>
                     </div>
@@ -334,7 +330,7 @@ const ReminderList = ({ refreshTrigger }) => {
                             <FaEdit size={13} />
                           </button>
                           <button
-                            onClick={() => deleteReminder(r.id)}
+                            onClick={() => setDeleteModalId(r.id)}
                             disabled={deletingId === r.id}
                             className="p-1.5 rounded-lg text-content hover:text-red-500 hover:bg-red-50 transition disabled:opacity-50"
                             title="Delete"
@@ -369,6 +365,45 @@ const ReminderList = ({ refreshTrigger }) => {
           </div>
         )}
       </div>
+      {/* Delete Confirmation Modal */}
+      {deleteModalId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm border border-gray">
+            {/* Header with X button */}
+            <div className="flex items-start justify-between mb-1">
+              <h3
+                className="text-lg font-normal text-gray-900"
+                style={{ fontFamily: "'DM Serif Display', serif" }}
+              >
+                Delete <span className="text-red-500">reminder?</span>
+              </h3>
+              <button
+                onClick={() => setDeleteModalId(null)}
+                className="text-content hover:text-gray-700 transition mt-1"
+              >
+                <FaTimes size={16} />
+              </button>
+            </div>
+            <p className="text-sm text-content mb-5">
+              This action cannot be undone.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={deleteReminder}
+                className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-medium transition"
+              >
+                Yes, delete
+              </button>
+              <button
+                onClick={() => setDeleteModalId(null)}
+                className="flex-1 py-2.5 rounded-xl border border-gray text-content text-sm font-medium hover:bg-[#f4f3ee] transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

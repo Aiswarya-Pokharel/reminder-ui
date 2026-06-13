@@ -9,6 +9,7 @@ import {
   FaCheckCircle,
   FaSpinner,
   FaTimes,
+  FaMagic,
 } from "react-icons/fa";
 import BASE_URL from "../api";
 
@@ -24,6 +25,12 @@ const ReminderForm = () => {
   const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({});
 
+  // AI smart create states
+  const [smartText, setSmartText] = useState("");
+  const [smartLoading, setSmartLoading] = useState(false);
+  const [smartWarning, setSmartWarning] = useState(null);
+  const [showSmartInput, setShowSmartInput] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -36,6 +43,60 @@ const ReminderForm = () => {
     if (!form.reminder_date) newErrors.reminder_date = "Date is required";
     if (!form.reminder_time) newErrors.reminder_time = "Time is required";
     return newErrors;
+  };
+
+  // AI smart create handler
+  const handleSmartCreate = async () => {
+    if (!smartText.trim()) return;
+    setSmartLoading(true);
+    setSmartWarning(null);
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/reminders/smart-create/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: smartText }),
+      });
+
+      const data = await response.json();
+
+      // duplicate detected
+      if (data.warning) {
+        setSmartWarning(
+          `Duplicate found: "${data.matched_with}" already exists.`,
+        );
+        // still fill the form with extracted data so user can edit
+        fillForm(data.extracted);
+        return;
+      }
+
+      // success — reminder already saved by backend
+      setStatus("success");
+      setSmartText("");
+      setShowSmartInput(false);
+
+      setTimeout(() => navigate("/reminders"), 1500);
+    } catch {
+      setSmartWarning("AI request failed. Please try again.");
+    } finally {
+      setSmartLoading(false);
+    }
+  };
+
+  // fills the form fields from AI extracted data
+  const fillForm = (extracted) => {
+    if (!extracted) return;
+    const dt = new Date(extracted.reminder_time);
+    const date = dt.toISOString().split("T")[0];
+    const time = dt.toTimeString().slice(0, 5);
+    setForm({
+      title: extracted.title || "",
+      description: extracted.description || "",
+      reminder_date: date,
+      reminder_time: time,
+      priority: extracted.priority || "Medium",
+    });
+    setShowSmartInput(false);
   };
 
   const handleSubmit = async (e) => {
@@ -100,7 +161,6 @@ const ReminderForm = () => {
               New <span className="text-emerald-600">reminder</span>
             </h2>
           </div>
-
           <button
             onClick={() => navigate("/")}
             className="text-content hover:text-gray-700 transition mt-1"
@@ -108,6 +168,53 @@ const ReminderForm = () => {
             <FaTimes size={16} />
           </button>
         </div>
+
+        {/* AI Smart Create Button */}
+        <button
+          type="button"
+          onClick={() => {
+            setShowSmartInput((prev) => !prev);
+            setSmartWarning(null);
+          }}
+          className="w-full mb-4 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-emerald-400 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 text-sm font-medium transition"
+        >
+          <FaMagic size={13} />
+          {showSmartInput ? "Hide AI Input" : "Smart Create with AI"}
+        </button>
+
+        {/* AI Input Box */}
+        {showSmartInput && (
+          <div className="mb-4 flex flex-col gap-2">
+            <input
+              type="text"
+              value={smartText}
+              onChange={(e) => setSmartText(e.target.value)}
+              placeholder='e.g. "pay electricity bill next month"'
+              className="border border-emerald-300 rounded-xl px-3 py-2.5 text-sm w-full bg-[#f4f3ee] focus:outline-none focus:ring-2 focus:ring-emerald-300 transition"
+            />
+            <button
+              type="button"
+              onClick={handleSmartCreate}
+              disabled={smartLoading || !smartText.trim()}
+              className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {smartLoading ? (
+                <>
+                  <FaSpinner className="animate-spin" size={13} /> Extracting...
+                </>
+              ) : (
+                "Extract & Fill"
+              )}
+            </button>
+
+            {/* Duplicate warning */}
+            {smartWarning && (
+              <div className="text-yellow-700 bg-yellow-50 border border-yellow-300 rounded-xl px-4 py-2.5 text-sm">
+                ⚠️ {smartWarning} You can edit the form below and save manually.
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Success */}
         {status === "success" && (
