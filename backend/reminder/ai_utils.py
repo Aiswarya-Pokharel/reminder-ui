@@ -47,7 +47,7 @@ def extract_reminder_from_text(user_text):
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         max_tokens=300,
-        temperature=0.1  # low = more consistent/accurate output
+        temperature=0.1  
     )
 
     raw = response.choices[0].message.content.strip()

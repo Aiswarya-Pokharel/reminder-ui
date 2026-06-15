@@ -210,7 +210,7 @@ const ReminderForm = () => {
             {/* Duplicate warning */}
             {smartWarning && (
               <div className="text-yellow-700 bg-yellow-50 border border-yellow-300 rounded-xl px-4 py-2.5 text-sm">
-                ⚠️ {smartWarning} You can edit the form below and save manually.
+                {smartWarning} You can edit the form below and save manually.
               </div>
             )}
           </div>

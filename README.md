@@ -6,6 +6,10 @@ A full-stack reminder management app to help you stay on top of what matters.
 
 https://reminder-ui-tau.vercel.app
 
+## 🔁 CI Status
+
+![CI](https://github.com/Aiswarya-Pokharel/reminder-ui/actions/workflows/reminder_workflow.yml/badge.svg)
+
 ---
 
 ## 🛠 Tech Stack
@@ -14,8 +18,10 @@ https://reminder-ui-tau.vercel.app
 | ---------- | --------------------------------------- |
 | Frontend   | React, Vite, Tailwind CSS, React Router |
 | Backend    | Django, Django REST Framework           |
-| Database   | SQLite                                  |
-| Deployment | Vercel (Frontend) , Render (backend)    |
+| Database   | PostgreSQL                              |
+| Deployment | Vercel (Frontend), Render (Backend)     |
+| CI/CD      | GitHub Actions                          |
+| Container  | Docker, Docker Compose                  |
 
 ---
 
@@ -35,7 +41,11 @@ https://reminder-ui-tau.vercel.app
 
 ```plaintext
 reminder_api/
-├── frontend/                  # React + Vite app
+├── .github/
+│   └── workflows/
+│       └── reminder_workflow.yml  # GitHub Actions CI
+├── frontend/                      # React + Vite app
+│   ├── Dockerfile
 │   ├── src/
 │   │   ├── Components/
 │   │   │  ├── ReminderForm.jsx
@@ -48,7 +58,8 @@ reminder_api/
 │   ├── vercel.json
 │   └── package.json
 │
-└── backend/                   # Django REST API
+└── backend/                       # Django REST API
+    ├── Dockerfile
     ├── reminder/
     │   ├── models.py
     │   ├── views.py
@@ -56,6 +67,8 @@ reminder_api/
     │   └── urls.py
     ├── manage.py
     └── requirements.txt
+├── docker-compose.yml
+├── .env.example
 ```
 
 ---
@@ -86,6 +99,55 @@ python manage.py runserver
 
 ---
 
+## 🐳 Run with Docker
+
+### Prerequisites
+
+- Docker Desktop installed
+
+### Steps
+
+```bash
+# 1. Copy env file and fill in values
+cp .env.example backend/.env
+
+# 2. Build and start all services
+docker compose up --build
+
+# 3. Run migrations (first time only)
+docker compose exec backend python manage.py migrate
+
+# 4. Create admin user (first time only)
+docker compose exec backend python manage.py createsuperuser
+```
+
+### Services
+
+| Service  | URL                         |
+| -------- | --------------------------- |
+| Frontend | http://localhost:5173       |
+| Backend  | http://localhost:8000       |
+| Admin    | http://localhost:8000/admin |
+
+### Stop Docker
+
+```bash
+docker compose down
+```
+
+---
+
+## ⚙️ GitHub Actions CI
+
+This project uses GitHub Actions for continuous integration on every push:
+
+- ✅ Installs Python dependencies
+- ✅ Runs Django tests with SQLite
+- ✅ Installs Node dependencies
+- ✅ Builds React frontend
+
+---
+
 ## 🌐 API Endpoints
 
 | Method | Endpoint               | Description       |
@@ -100,6 +162,7 @@ python manage.py runserver
 ## 🚢 Deployment
 
 - **Frontend** → Vercel
+- **Backend** → Render
 
 ---
 
