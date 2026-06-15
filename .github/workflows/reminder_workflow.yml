@@ -40,6 +40,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
           SECRET_KEY: test-secret-key
           DEBUG: True
+          GROQ_API_KEY: dummy-key-for-testing
         run: python manage.py test
 
   frontend:
